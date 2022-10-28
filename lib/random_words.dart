@@ -32,20 +32,25 @@ class RandomWordsState extends State<RandomWords> {
 
     return ListTile(
         title: Text(pair.asPascalCase, style: TextStyle(fontSize: 18.0)),
-        trailing: Icon(alreadySaved ? Icons.favorite : Icons.favorite_border,
-            color: alreadySaved ? Colors.red : null),
+        trailing: IconButton(
+          icon: Icon(alreadySaved ? Icons.favorite : Icons.favorite_border),
+          color: alreadySaved ? Colors.red : null,
+          onPressed: () => {
+            setState(() {
+              if (alreadySaved) {
+                _savedWordPairs.remove(pair);
+              } else {
+                _savedWordPairs.add(pair);
+              }
+            })
+          },
+        ),
         onTap: () {
-          setState(() {
-            if (alreadySaved) {
-              _savedWordPairs.remove(pair);
-            } else {
-              _savedWordPairs.add(pair);
-            }
-          });
+          _viewDetailsScreen(pair.asPascalCase.toString());
         });
   }
 
-  void _pushSaved() {
+  void _viewFavouritesScreen() {
     Navigator.of(context)
         .push(MaterialPageRoute(builder: (BuildContext context) {
       final Iterable<ListTile> tiles = _savedWordPairs.map((WordPair pair) {
@@ -62,12 +67,27 @@ class RandomWordsState extends State<RandomWords> {
     }));
   }
 
+  void _viewDetailsScreen(String wordPair) {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (BuildContext context) {
+      return Scaffold(
+        appBar: AppBar(title: Text('$wordPair Details')),
+        body: Center(
+          child: Container(
+            alignment: const Alignment(0.0, -0.9),
+            child: Text(wordPair, style: TextStyle(fontSize: 35.0)),
+          ),
+        ),
+      );
+    }));
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           title: Text('WordPair Generator'),
           actions: <Widget>[
-            IconButton(icon: Icon(Icons.list), onPressed: _pushSaved)
+            IconButton(icon: Icon(Icons.list), onPressed: _viewFavouritesScreen)
           ],
         ),
         body: _buildList());
